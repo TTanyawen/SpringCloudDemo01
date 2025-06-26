@@ -18,7 +18,7 @@ public class PaymentController {
     @PostMapping(value = "/payment/create")
     public CommonResult<Payment> create(Payment payment){ //埋雷
         int result = paymentService.create(payment);
-        log.info("*****插入结果："+result);
+        log.info("*****插入结果kk："+result);
         if (result>0){  //成功
             return new CommonResult(200,"插入数据库成功",result);
         }else {
