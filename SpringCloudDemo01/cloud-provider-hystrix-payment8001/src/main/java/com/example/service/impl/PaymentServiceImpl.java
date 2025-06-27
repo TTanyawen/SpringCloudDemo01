@@ -1,9 +1,12 @@
 package com.example.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import com.example.service.PaymentService;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.concurrent.TimeUnit;
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -31,6 +34,31 @@ public class PaymentServiceImpl implements PaymentService {
     public String paymentInfo_TimeoutHandler(Integer id) {
         return "线程池：" + Thread.currentThread().getName() + " paymentInfo_TimeoutHandler,系统繁忙,请稍后再试\t o(╥﹏╥)o ";
     }
+
+
+    //服务熔断
+    @HystrixCommand(fallbackMethod = "paymentCircuitBreaker_fallback",commandProperties = {
+            @HystrixProperty(name = "circuitBreaker.enabled",value = "true"),  //是否开启断路器
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold",value = "10"),
+//当在配置时间（10s）内达到此数量的失败后，打开断路，默认20个,此处设置为10个
+            @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds",value = "10000"),
+            //断路多久以后开始尝试是否恢复，默认5s,这里设置为10000毫秒（10秒）
+            @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage",value = "60"),
+//出错百分比阈值，当出错百分比达到此阈值后，开始短路。默认50%
+    })
+    public String paymentCircuitBreaker(Integer id){
+        if (id < 0){
+            throw new RuntimeException("*****id 不能负数");
+        }
+        String serialNumber = IdUtil.simpleUUID();//hutool.cn工具包,pom中以及引入起依赖管理器
+
+        return Thread.currentThread().getName()+"\t"+"调用成功,流水号："+serialNumber;
+    }
+
+    public String paymentCircuitBreaker_fallback(@PathVariable("id") Integer id){
+        return "id 不能负数，请稍候再试,(┬＿┬)/~~     id: " +id;
+    }
+
 }
 
 //

@@ -27,4 +27,16 @@ public class PaymentController {
         log.info("*******result:"+result);
         return result+",~~~端口号："+port;
     }
+
+
+    //-------服务熔断
+    // 多次错误调用：http://localhost:8001/payment/circuit/-31
+    //就会触发熔断，走配置的降级方法
+    //注解配置了具体触发的条件
+    @GetMapping("/payment/circuit/{id}")
+    public String paymentCircuitBreaker(@PathVariable("id") Integer id){
+        String result = paymentService.paymentCircuitBreaker(id);
+        log.info("*******result:"+result);
+        return result;
+    }
 }
