@@ -62,4 +62,9 @@ public class PaymentController {
         }catch (Exception e) {e.printStackTrace();}
         return port;
     }
+
+    @GetMapping("/payment/zipkin")
+    public String paymentZipkin(){
+        return "hi ,i'am paymentzipkin server，welcome~~，O(∩_∩)O哈哈~";
+    }
 }
